@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Docker Redmine by dockerimages</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Docker Redmine</h1>
+          <h2>A Dockerfile that installs redmine, apache-mpm-event + mod_proxy_html</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/dockerimages/docker-redmine/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/dockerimages/docker-redmine/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/dockerimages/docker-redmine" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h1>
+
+<ul>
+<li>
+<a href="#introduction">Introduction</a>
+
+<ul>
+<li><a href="#version">Version</a></li>
+<li><a href="Changelog.md">Changelog</a></li>
+</ul>
+</li>
+<li><a href="#reporting-issues">Reporting Issues</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li>
+<a href="#configuration">Configuration</a>
+
+<ul>
+<li><a href="#data-store">Data Store</a></li>
+<li>
+<a href="#database">Database</a>
+
+<ul>
+<li>
+<a href="#mysql">MySQL</a>
+
+<ul>
+<li><a href="#internal-mysql-server">Internal MySQL Server</a></li>
+<li><a href="#external-mysql-server">External MySQL Server</a></li>
+<li><a href="#linking-to-mysql-container">Linking to MySQL Container</a></li>
+</ul>
+</li>
+<li>
+<a href="#postgresql">PostgreSQL</a>
+
+<ul>
+<li><a href="#external-postgresql-server">External PostgreSQL Server</a></li>
+<li><a href="#linking-to-postgresql-container">Linking to PostgreSQL Container</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#memcached-optional">Memcached (Optional)</a>
+
+<ul>
+<li><a href="#external-memcached-server">External Memcached Server</a></li>
+<li><a href="#linking-to-memcached-container">Linking to Memcached Container</a></li>
+</ul>
+</li>
+<li><a href="#mail">Mail</a></li>
+<li>
+<a href="#ssl">SSL</a>
+
+<ul>
+<li><a href="#generation-of-self-signed-certificates">Generation of Self Signed Certificates</a></li>
+<li><a href="#strengthening-the-server-security">Strengthening the server security</a></li>
+<li><a href="#installation-of-the-certificates">Installation of the Certificates</a></li>
+<li><a href="#enabling-https-support">Enabling HTTPS support</a></li>
+<li><a href="#using-https-with-a-load-balancer">Using HTTPS with a load balancer</a></li>
+</ul>
+</li>
+<li><a href="#deploy-to-a-subdirectory-relative-url-root">Deploy to a subdirectory (relative url root)</a></li>
+<li><a href="#putting-it-all-together">Putting it all together</a></li>
+<li><a href="#available-configuration-parameters">Available Configuration Parameters</a></li>
+</ul>
+</li>
+<li>
+<a href="#plugins">Plugins</a>
+
+<ul>
+<li><a href="#installing-plugins">Installing Plugins</a></li>
+<li><a href="#uninstalling-plugins">Uninstalling Plugins</a></li>
+</ul>
+</li>
+<li>
+<a href="#plugins">Themes</a>
+
+<ul>
+<li><a href="#installing-themes">Installing Themes</a></li>
+<li><a href="#uninstalling-themes">Uninstalling Themes</a></li>
+</ul>
+</li>
+<li><a href="#shell-access">Shell Access</a></li>
+<li><a href="#upgrading">Upgrading</a></li>
+<li><a href="#rake-tasks">Rake Tasks</a></li>
+<li><a href="#references">References</a></li>
+</ul><h1>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h1>
+
+<p>Dockerfile to build a Redmine container image.</p>
+
+<h2>
+<a name="version" class="anchor" href="#version"><span class="octicon octicon-link"></span></a>Version</h2>
+
+<p>Current Version: <strong>2.5.2-2</strong></p>
+
+<h1>
+<a name="reporting-issues" class="anchor" href="#reporting-issues"><span class="octicon octicon-link"></span></a>Reporting Issues</h1>
+
+<p>Docker is a relatively new project and is active being developed and tested by a thriving community of developers and testers and every release of docker features many enhancements and bugfixes.</p>
+
+<p>Given the nature of the development and release cycle it is very important that you have the latest version of docker installed because any issue that you encounter might have already been fixed with a newer docker release.</p>
+
+<p>For ubuntu users I suggest <a href="https://docs.docker.com/installation/ubuntulinux/">installing docker</a> using docker's own package repository since the version of docker packaged in the ubuntu repositories are a little dated.</p>
+
+<p>Here is the shortform of the installation of an updated version of docker on ubuntu.</p>
+
+<div class="highlight highlight-bash"><pre>sudo apt-get purge docker.io
+curl -s https://get.docker.io/ubuntu/ <span class="p">|</span> sudo sh
+sudo apt-get update
+sudo apt-get install lxc-docker
+</pre></div>
+
+<p>Fedora and RHEL/CentOS users should try disabling selinux with <code>setenforce 0</code> and check if resolves the issue. If it does than there is not much that I can help you with. You can either stick with selinux disabled (not recommended by redhat) or switch to using ubuntu.</p>
+
+<p>If using the latest docker version and/or disabling selinux does not fix the issue then please file a issue request on the <a href="https://github.com/dockerimages/docker-redmine/issues">issues</a> page.</p>
+
+<p>In your issue report please make sure you provide the following information:</p>
+
+<ul>
+<li>The host ditribution and release version.</li>
+<li>Output of the <code>docker version</code> command</li>
+<li>Output of the <code>docker info</code> command</li>
+<li>The <code>docker run</code> command you used to run the image (mask out the sensitive bits).</li>
+</ul><h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>Pull the image from the docker index. This is the recommended method of installation as it is easier to update image in the future. These builds are performed by the Trusted Build service.</p>
+
+<div class="highlight highlight-bash"><pre>docker pull dockerimages/redmine:latest
+</pre></div>
+
+<p>Since version <code>2.4.2</code>, the image builds are being tagged. You can now pull a particular version of redmine by specifying the version number. For example,</p>
+
+<div class="highlight highlight-bash"><pre>docker pull dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>Alternately you can build the image yourself.</p>
+
+<div class="highlight highlight-bash"><pre>git clone https://github.com/dockerimages/docker-redmine.git
+<span class="nb">cd </span>docker-redmine
+docker build --tag<span class="o">=</span><span class="s2">"$USER/redmine"</span> .
+</pre></div>
+
+<h1>
+<a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h1>
+
+<p>Run the redmine image with the name "redmine".</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm -p 10080:80 <span class="se">\</span>
+dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p><strong>NOTE</strong>: Please allow a minute or two for the Redmine application to start.</p>
+
+<p>Point your browser to <code>http://localhost:10080</code> and login using the default username and password:</p>
+
+<ul>
+<li>username: <strong>admin</strong>
+</li>
+<li>password: <strong>admin</strong>
+</li>
+</ul><p>You should now have the Redmine application up and ready for testing. If you want to use this image in production the please read on.</p>
+
+<h1>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h1>
+
+<h2>
+<a name="data-store" class="anchor" href="#data-store"><span class="octicon octicon-link"></span></a>Data Store</h2>
+
+<p>For the file storage we need to mount a volume at the following location.</p>
+
+<ul>
+<li><code>/home/redmine/data</code></li>
+</ul><blockquote>
+<p><strong>NOTE</strong></p>
+
+<p>Existing users <strong>need to move</strong> the existing files directory inside <code>/opt/redmine/data/</code>.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/redmine/data
+mv /opt/redmine/files /opt/redmine/data
+</pre></div>
+</blockquote>
+
+<p>SELinux users are also required to change the security context of the mount point so that it plays nicely with selinux.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/redmine/data
+sudo chcon -Rt svirt_sandbox_file_t /opt/redmine/data
+</pre></div>
+
+<p>Volumes can be mounted in docker by specifying the <strong>'-v'</strong> option in the docker run command.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h2>
+<a name="database" class="anchor" href="#database"><span class="octicon octicon-link"></span></a>Database</h2>
+
+<p>Redmine uses a database backend to store its data.</p>
+
+<h3>
+<a name="mysql" class="anchor" href="#mysql"><span class="octicon octicon-link"></span></a>MySQL</h3>
+
+<h4>
+<a name="internal-mysql-server" class="anchor" href="#internal-mysql-server"><span class="octicon octicon-link"></span></a>Internal MySQL Server</h4>
+
+<blockquote>
+<p><strong>Warning</strong></p>
+
+<p>The internal mysql server will soon be removed from the image.</p>
+
+<p>Please use a linked <a href="#linking-to-mysql-container">mysql</a> or
+<a href="#linking-to-postgresql-container">postgresql</a> container instead.
+Or else connect with an external <a href="#external-mysql-server">mysql</a> or
+<a href="#external-postgresql-server">postgresql</a> server.</p>
+
+<p>You've been warned.</p>
+</blockquote>
+
+<p>This docker image is configured to use a MySQL database backend. The database connection can be configured using environment variables. If not specified, the image will start a mysql server internally and use it. However in this case, the data stored in the mysql database will be lost if the container is stopped/deleted. To avoid this you should mount a volume at <code>/var/lib/mysql</code>.</p>
+
+<p>SELinux users are also required to change the security context of the mount point so that it plays nicely with selinux.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/redmine/mysql
+sudo chcon -Rt svirt_sandbox_file_t /opt/redmine/mysql
+</pre></div>
+
+<p>The updated run command looks like this.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  -v /opt/redmine/mysql:/var/lib/mysql dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>This will make sure that the data stored in the database is not lost when the image is stopped and started again.</p>
+
+<h4>
+<a name="external-mysql-server" class="anchor" href="#external-mysql-server"><span class="octicon octicon-link"></span></a>External MySQL Server</h4>
+
+<p>The image can be configured to use an external MySQL database instead of starting a MySQL server internally. The database configuration should be specified using environment variables while starting the Redmine image.</p>
+
+<p>Before you start the Redmine image create user and database for redmine.</p>
+
+<div class="highlight highlight-sql"><pre><span class="n">mysql</span> <span class="o">-</span><span class="n">uroot</span> <span class="o">-</span><span class="n">p</span>
+<span class="k">CREATE</span> <span class="k">USER</span> <span class="s1">'redmine'</span><span class="o">@</span><span class="s1">'%.%.%.%'</span> <span class="n">IDENTIFIED</span> <span class="k">BY</span> <span class="s1">'password'</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">IF</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="o">`</span><span class="n">redmine_production</span><span class="o">`</span> <span class="k">DEFAULT</span> <span class="nb">CHARACTER</span> <span class="k">SET</span> <span class="o">`</span><span class="n">utf8</span><span class="o">`</span> <span class="k">COLLATE</span> <span class="o">`</span><span class="n">utf8_unicode_ci</span><span class="o">`</span><span class="p">;</span>
+<span class="k">GRANT</span> <span class="k">SELECT</span><span class="p">,</span> <span class="k">LOCK</span> <span class="n">TABLES</span><span class="p">,</span> <span class="k">INSERT</span><span class="p">,</span> <span class="k">UPDATE</span><span class="p">,</span> <span class="k">DELETE</span><span class="p">,</span> <span class="k">CREATE</span><span class="p">,</span> <span class="k">DROP</span><span class="p">,</span> <span class="k">INDEX</span><span class="p">,</span> <span class="k">ALTER</span> <span class="k">ON</span> <span class="o">`</span><span class="n">redmine_production</span><span class="o">`</span><span class="p">.</span><span class="o">*</span> <span class="k">TO</span> <span class="s1">'redmine'</span><span class="o">@</span><span class="s1">'%.%.%.%'</span><span class="p">;</span>
+</pre></div>
+
+<p>We are now ready to start the redmine application.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -e <span class="s2">"DB_HOST=192.168.1.100"</span> -e <span class="s2">"DB_NAME=redmine_production"</span> <span class="se">\</span>
+  -e <span class="s2">"DB_USER=redmine"</span> -e <span class="s2">"DB_PASS=password"</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>This will initialize the redmine database and after a couple of minutes your redmine instance should be ready to use.</p>
+
+<h4>
+<a name="linking-to-mysql-container" class="anchor" href="#linking-to-mysql-container"><span class="octicon octicon-link"></span></a>Linking to MySQL Container</h4>
+
+<p>You can link this image with a mysql container for the database requirements. The alias of the mysql server container should be set to <strong>mysql</strong> while linking with the redmine image.</p>
+
+<p>If a mysql container is linked, only the <code>DB_TYPE</code>, <code>DB_HOST</code> and <code>DB_PORT</code> settings are automatically retrieved using the linkage. You may still need to set other database connection parameters such as the <code>DB_NAME</code>, <code>DB_USER</code>, <code>DB_PASS</code> and so on.</p>
+
+<p>To illustrate linking with a mysql container, we will use the <a href="https://github.com/dockerimages/docker-mysql">dockerimages/mysql</a> image. When using docker-mysql in production you should mount a volume for the mysql data store. Please refer the <a href="https://github.com/dockerimages/docker-mysql/blob/master/README.md">README</a> of docker-mysql for details.</p>
+
+<p>First, lets pull the mysql image from the docker index.</p>
+
+<div class="highlight highlight-bash"><pre>docker pull dockerimages/mysql:latest
+</pre></div>
+
+<p>For data persistence lets create a store for the mysql and start the container.</p>
+
+<p>SELinux users are also required to change the security context of the mount point so that it plays nicely with selinux.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/mysql/data
+sudo chcon -Rt svirt_sandbox_file_t /opt/mysql/data
+</pre></div>
+
+<p>The updated run command looks like this.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name mysql -it --rm <span class="se">\</span>
+  -v /opt/mysql/data:/var/lib/mysql <span class="se">\</span>
+  dockerimages/mysql:latest
+</pre></div>
+
+<p>You should now have the mysql server running. By default the dockerimages/mysql image does not assign a password for the root user and allows remote connections for the root user from the <code>172.17.%.%</code> address space. This means you can login to the mysql server from the host as the root user.</p>
+
+<p>Now, lets login to the mysql server and create a user and database for the redmine application.</p>
+
+<div class="highlight highlight-bash"><pre>docker run -it --rm dockerimages/mysql:latest mysql -uroot -h<span class="k">$(</span>docker inspect --format <span class="o">{{</span>.NetworkSettings.IPAddress<span class="o">}}</span> mysql<span class="k">)</span>
+</pre></div>
+
+<div class="highlight highlight-sql"><pre><span class="k">CREATE</span> <span class="k">USER</span> <span class="s1">'redmine'</span><span class="o">@</span><span class="s1">'172.17.%.%'</span> <span class="n">IDENTIFIED</span> <span class="k">BY</span> <span class="s1">'password'</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">IF</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="o">`</span><span class="n">redmine_production</span><span class="o">`</span> <span class="k">DEFAULT</span> <span class="nb">CHARACTER</span> <span class="k">SET</span> <span class="o">`</span><span class="n">utf8</span><span class="o">`</span> <span class="k">COLLATE</span> <span class="o">`</span><span class="n">utf8_unicode_ci</span><span class="o">`</span><span class="p">;</span>
+<span class="k">GRANT</span> <span class="k">SELECT</span><span class="p">,</span> <span class="k">LOCK</span> <span class="n">TABLES</span><span class="p">,</span> <span class="k">INSERT</span><span class="p">,</span> <span class="k">UPDATE</span><span class="p">,</span> <span class="k">DELETE</span><span class="p">,</span> <span class="k">CREATE</span><span class="p">,</span> <span class="k">DROP</span><span class="p">,</span> <span class="k">INDEX</span><span class="p">,</span> <span class="k">ALTER</span> <span class="k">ON</span> <span class="o">`</span><span class="n">redmine_production</span><span class="o">`</span><span class="p">.</span><span class="o">*</span> <span class="k">TO</span> <span class="s1">'redmine'</span><span class="o">@</span><span class="s1">'172.17.%.%'</span><span class="p">;</span>
+<span class="n">FLUSH</span> <span class="k">PRIVILEGES</span><span class="p">;</span>
+</pre></div>
+
+<p>We are now ready to start the redmine application.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm --link mysql:mysql <span class="se">\</span>
+  -e <span class="s2">"DB_USER=redmine"</span> -e <span class="s2">"DB_PASS=password"</span> <span class="se">\</span>
+  -e <span class="s2">"DB_NAME=redmine_production"</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h3>
+<a name="postgresql" class="anchor" href="#postgresql"><span class="octicon octicon-link"></span></a>PostgreSQL</h3>
+
+<h4>
+<a name="external-postgresql-server" class="anchor" href="#external-postgresql-server"><span class="octicon octicon-link"></span></a>External PostgreSQL Server</h4>
+
+<p>The image also supports using an external PostgreSQL Server. This is also controlled via environment variables.</p>
+
+<div class="highlight highlight-sql"><pre><span class="k">CREATE</span> <span class="k">ROLE</span> <span class="n">redmine</span> <span class="k">with</span> <span class="n">LOGIN</span> <span class="k">CREATEDB</span> <span class="n">PASSWORD</span> <span class="s1">'password'</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">redmine_production</span><span class="p">;</span>
+<span class="k">GRANT</span> <span class="k">ALL</span> <span class="k">PRIVILEGES</span> <span class="k">ON</span> <span class="k">DATABASE</span> <span class="n">redmine_production</span> <span class="k">to</span> <span class="n">redmine</span><span class="p">;</span>
+</pre></div>
+
+<p>We are now ready to start the redmine application.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -e <span class="s2">"DB_TYPE=postgres"</span> -e <span class="s2">"DB_HOST=192.168.1.100"</span> <span class="se">\</span>
+  -e <span class="s2">"DB_NAME=redmine_production"</span> -e <span class="s2">"DB_USER=redmine"</span> -e <span class="s2">"DB_PASS=password"</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>This will initialize the redmine database and after a couple of minutes your redmine instance should be ready to use.</p>
+
+<h4>
+<a name="linking-to-postgresql-container" class="anchor" href="#linking-to-postgresql-container"><span class="octicon octicon-link"></span></a>Linking to PostgreSQL Container</h4>
+
+<p>You can link this image with a postgresql container for the database requirements. The alias of the postgresql server container should be set to <strong>postgresql</strong> while linking with the redmine image.</p>
+
+<p>If a postgresql container is linked, only the <code>DB_TYPE</code>, <code>DB_HOST</code> and <code>DB_PORT</code> settings are automatically retrieved using the linkage. You may still need to set other database connection parameters such as the <code>DB_NAME</code>, <code>DB_USER</code>, <code>DB_PASS</code> and so on.</p>
+
+<p>To illustrate linking with a postgresql container, we will use the <a href="https://github.com/dockerimages/docker-postgresql">dockerimages/postgresql</a> image. When using postgresql image in production you should mount a volume for the postgresql data store. Please refer the <a href="https://github.com/dockerimages/docker-postgresql/blob/master/README.md">README</a> of docker-postgresql for details.</p>
+
+<p>First, lets pull the postgresql image from the docker index.</p>
+
+<div class="highlight highlight-bash"><pre>docker pull dockerimages/postgresql:latest
+</pre></div>
+
+<p>For data persistence lets create a store for the postgresql and start the container.</p>
+
+<p>SELinux users are also required to change the security context of the mount point so that it plays nicely with selinux.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/postgresql/data
+sudo chcon -Rt svirt_sandbox_file_t /opt/postgresql/data
+</pre></div>
+
+<p>The updated run command looks like this.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name postgresql -it --rm <span class="se">\</span>
+  -v /opt/postgresql/data:/var/lib/postgresql <span class="se">\</span>
+  dockerimages/postgresql:latest
+</pre></div>
+
+<p>You should now have the postgresql server running. The password for the postgres user can be found in the logs of the postgresql image.</p>
+
+<div class="highlight highlight-bash"><pre>docker logs postgresql
+</pre></div>
+
+<p>Now, lets login to the postgresql server and create a user and database for the redmine application.</p>
+
+<div class="highlight highlight-bash"><pre>docker run -it --rm dockerimages/postgresql:latest psql -U postgres -h <span class="k">$(</span>docker inspect --format <span class="o">{{</span>.NetworkSettings.IPAddress<span class="o">}}</span> postgresql<span class="k">)</span>
+</pre></div>
+
+<div class="highlight highlight-sql"><pre><span class="k">CREATE</span> <span class="k">ROLE</span> <span class="n">redmine</span> <span class="k">with</span> <span class="n">LOGIN</span> <span class="k">CREATEDB</span> <span class="n">PASSWORD</span> <span class="s1">'password'</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">redmine_production</span><span class="p">;</span>
+<span class="k">GRANT</span> <span class="k">ALL</span> <span class="k">PRIVILEGES</span> <span class="k">ON</span> <span class="k">DATABASE</span> <span class="n">redmine_production</span> <span class="k">to</span> <span class="n">redmine</span><span class="p">;</span>
+</pre></div>
+
+<p>We are now ready to start the redmine application.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm --link postgresql:postgresql <span class="se">\</span>
+  -e <span class="s2">"DB_USER=redmine"</span> -e <span class="s2">"DB_PASS=password"</span> <span class="se">\</span>
+  -e <span class="s2">"DB_NAME=redmine_production"</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h2>
+<a name="memcached-optional" class="anchor" href="#memcached-optional"><span class="octicon octicon-link"></span></a>Memcached (Optional)</h2>
+
+<p>This image can (optionally) be configured to use a memcached server to speed up Redmine. This is particularly useful when you have a large number users.</p>
+
+<h3>
+<a name="external-memcached-server" class="anchor" href="#external-memcached-server"><span class="octicon octicon-link"></span></a>External Memcached Server</h3>
+
+<p>The image can be configured to use an external memcached server. The memcached server host and port configuration should be specified using environment variables <code>MEMCACHE_HOST</code> and <code>MEMCACHE_PORT</code> like so:</p>
+
+<p><em>Assuming that the memcached server host is 192.168.1.100</em></p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -e <span class="s1">'MEMCACHE_HOST=192.168.1.100'</span> -e <span class="s1">'MEMCACHE_PORT=11211'</span> <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h3>
+<a name="linking-to-memcached-container" class="anchor" href="#linking-to-memcached-container"><span class="octicon octicon-link"></span></a>Linking to Memcached Container</h3>
+
+<p>Alternately you can link this image with a memcached container. The alias of the memcached server container should be set to <strong>memcached</strong> while linking with the redmine image.</p>
+
+<p>To illustrate linking with a memcached container, we will use the <a href="https://github.com/dockerimages/docker-memcached">dockerimages/memcached</a> image. Please refer the <a href="https://github.com/dockerimages/docker-memcached/blob/master/README.md">README</a> of docker-memcached for details.</p>
+
+<p>First, lets pull and launch the memcached image from the docker index.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>memcached -d dockerimages/memcached:latest
+</pre></div>
+
+<p>Now you can link memcached to the redmine image:</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm --link memcached:memcached <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h3>
+<a name="mail" class="anchor" href="#mail"><span class="octicon octicon-link"></span></a>Mail</h3>
+
+<p>The mail configuration should be specified using environment variables while starting the redmine image. The configuration defaults to using gmail to send emails and requires the specification of a valid username and password to login to the gmail servers.</p>
+
+<p>The following environment variables need to be specified to get mail support to work.</p>
+
+<ul>
+<li>SMTP_ENABLED (defaults to <code>true</code> if <code>SMTP_USER</code> is defined, else defaults to <code>false</code>)</li>
+<li>SMTP_DOMAIN (defaults to <code>www.gmail.com</code>)</li>
+<li>SMTP_HOST (defaults to <code>smtp.gmail.com</code>)</li>
+<li>SMTP_PORT (defaults to <code>587</code>)</li>
+<li>SMTP_USER</li>
+<li>SMTP_PASS</li>
+<li>SMTP_STARTTLS (defaults to <code>true</code>)</li>
+<li>SMTP_AUTHENTICATION (defaults to <code>:login</code> if <code>SMTP_USER</code> is set)</li>
+</ul><div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -e <span class="s2">"SMTP_USER=USER@gmail.com"</span> -e <span class="s2">"SMTP_PASS=PASSWORD"</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>If you are not using google mail, then please configure the SMTP host and port using the <code>SMTP_HOST</code> and <code>SMTP_PORT</code> configuration parameters.</p>
+
+<p><strong>NOTE:</strong></p>
+
+<p>I have only tested standard gmail and google apps login. I expect that the currently provided configuration parameters should be sufficient for most users. If this is not the case, then please let me know.</p>
+
+<h3>
+<a name="ssl" class="anchor" href="#ssl"><span class="octicon octicon-link"></span></a>SSL</h3>
+
+<p>Access to the redmine application can be secured using SSL so as to prevent unauthorized access. While a CA certified SSL certificate allows for verification of trust via the CA, a self signed certificates can also provide an equal level of trust verification as long as each client takes some additional steps to verify the identity of your website. I will provide instructions on achieving this towards the end of this section.</p>
+
+<p>To secure your application via SSL you basically need two things:</p>
+
+<ul>
+<li><strong>Private key (.key)</strong></li>
+<li><strong>SSL certificate (.crt)</strong></li>
+</ul><p>When using CA certified certificates, these files are provided to you by the CA. When using self-signed certificates you need to generate these files yourself. Skip the following section if you are armed with CA certified SSL certificates.</p>
+
+<p>Jump to the <a href="#using-https-with-a-load-balancer">Using HTTPS with a load balancer</a> section if you are using a load balancer such as hipache, haproxy or nginx.</p>
+
+<h4>
+<a name="generation-of-self-signed-certificates" class="anchor" href="#generation-of-self-signed-certificates"><span class="octicon octicon-link"></span></a>Generation of Self Signed Certificates</h4>
+
+<p>Generation of self-signed SSL certificates involves a simple 3 step procedure.</p>
+
+<p><strong>STEP 1</strong>: Create the server private key</p>
+
+<div class="highlight highlight-bash"><pre>openssl genrsa -out redmine.key 2048
+</pre></div>
+
+<p><strong>STEP 2</strong>: Create the certificate signing request (CSR)</p>
+
+<div class="highlight highlight-bash"><pre>openssl req -new -key redmine.key -out redmine.csr
+</pre></div>
+
+<p><strong>STEP 3</strong>: Sign the certificate using the private key and CSR</p>
+
+<div class="highlight highlight-bash"><pre>openssl x509 -req -days <span class="m">365</span> -in redmine.csr -signkey redmine.key -out redmine.crt
+</pre></div>
+
+<p>Congratulations! you have now generated an SSL certificate thats valid for 365 days.</p>
+
+<h4>
+<a name="strengthening-the-server-security" class="anchor" href="#strengthening-the-server-security"><span class="octicon octicon-link"></span></a>Strengthening the server security</h4>
+
+<p>This section provides you with instructions to <a href="https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html">strengthen your server security</a>. To achieve this we need to generate stronger DHE parameters.</p>
+
+<div class="highlight highlight-bash"><pre>openssl dhparam -out dhparam.pem 2048
+</pre></div>
+
+<h4>
+<a name="installation-of-the-ssl-certificates" class="anchor" href="#installation-of-the-ssl-certificates"><span class="octicon octicon-link"></span></a>Installation of the SSL Certificates</h4>
+
+<p>Out of the four files generated above, we need to install the <code>redmine.key</code>, <code>redmine.crt</code> and <code>dhparam.pem</code> files at the redmine server. The CSR file is not needed, but do make sure you safely backup the file (in case you ever need it again).</p>
+
+<p>The default path that the redmine application is configured to look for the SSL certificates is at <code>/home/redmine/data/certs</code>, this can however be changed using the <code>SSL_KEY_PATH</code>, <code>SSL_CERTIFICATE_PATH</code> and <code>SSL_DHPARAM_PATH</code> configuration options.</p>
+
+<p>If you remember from above, the <code>/home/redmine/data</code> path is the path of the <a href="#data-store">data store</a>, which means that we have to create a folder named certs inside <code>/opt/redmine/data/</code> and copy the files into it and as a measure of security we will update the permission on the <code>redmine.key</code> file to only be readable by the owner.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/redmine/data/certs
+cp redmine.key /opt/redmine/data/certs/
+cp redmine.crt /opt/redmine/data/certs/
+cp dhparam.pem /opt/redmine/data/certs/
+chmod <span class="m">400</span> /opt/redmine/data/certs/redmine.key
+</pre></div>
+
+<p>Great! we are now just one step away from having our application secured.</p>
+
+<h4>
+<a name="enabling-https-support" class="anchor" href="#enabling-https-support"><span class="octicon octicon-link"></span></a>Enabling HTTPS support</h4>
+
+<p>HTTPS support can be enabled by setting the <code>REDMINE_HTTPS</code> option to <code>true</code>.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -d <span class="se">\</span>
+  -e <span class="s1">'REDMINE_HTTPS=true'</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>In this configuration, any requests made over the plain http protocol will automatically be redirected to use the https protocol. However, this is not optimal when using a load balancer.</p>
+
+<h4>
+<a name="using-https-with-a-load-balancer" class="anchor" href="#using-https-with-a-load-balancer"><span class="octicon octicon-link"></span></a>Using HTTPS with a load balancer</h4>
+
+<p>Load balancers like nginx/haproxy/hipache talk to backend applications over plain http and as such the installation of ssl keys and certificates are not required and should <strong>NOT</strong> be installed in the container. The SSL configuration has to instead be done at the load balancer. Hoewever, when using a load balancer you <strong>MUST</strong> set <code>REDMINE_HTTPS</code> to <code>true</code>.</p>
+
+<p>With this in place, you should configure the load balancer to support handling of https requests. But that is out of the scope of this document. Please refer to <a href="http://seanmcgary.com/posts/using-sslhttps-with-haproxy">Using SSL/HTTPS with HAProxy</a> for information on the subject.</p>
+
+<p>When using a load balancer, you probably want to make sure the load balancer performs the automatic http to https redirection. Information on this can also be found in the link above.</p>
+
+<p>In summation, when using a load balancer, the docker command would look for the most part something like this:</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -d -p 10080:80 <span class="se">\</span>
+  -e <span class="s1">'REDMINE_HTTPS=true'</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h3>
+<a name="deploy-to-a-subdirectory-relative-url-root" class="anchor" href="#deploy-to-a-subdirectory-relative-url-root"><span class="octicon octicon-link"></span></a>Deploy to a subdirectory (relative url root)</h3>
+
+<p>By default redmine expects that your application is running at the root (eg. /). This section explains how to run your application inside a directory.</p>
+
+<p>Let's assume we want to deploy our application to '/redmine'. Redmine needs to know this directory to generate the appropriate routes. This can be specified using the <code>REDMINE_RELATIVE_URL_ROOT</code> configuration option like so:</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -d -p 10080:80 <span class="se">\</span>
+  -e <span class="s1">'REDMINE_RELATIVE_URL_ROOT=/redmine'</span> <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>Redmine will now be accessible at the <code>/redmine</code> path, e.g. <code>http://www.example.com/redmine</code>.</p>
+
+<p><strong>Note</strong>: <em>The <code>REDMINE_RELATIVE_URL_ROOT</code> parameter should always begin with a slash and **SHOULD NOT*</em> have any trailing slashes.*</p>
+
+<h3>
+<a name="putting-it-all-together" class="anchor" href="#putting-it-all-together"><span class="octicon octicon-link"></span></a>Putting it all together</h3>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -d -h redmine.local.host <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  -v /opt/redmine/mysql:/var/lib/mysql <span class="se">\</span>
+  -e <span class="s2">"SMTP_USER=USER@gmail.com"</span> -e <span class="s2">"SMTP_PASS=PASSWORD"</span> <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p>If you are using an external mysql database</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -d -h redmine.local.host <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  -e <span class="s2">"DB_HOST=192.168.1.100"</span> -e <span class="s2">"DB_NAME=redmine_production"</span> -e <span class="s2">"DB_USER=redmine"</span> -e <span class="s2">"DB_PASS=password"</span> <span class="se">\</span>
+  -e <span class="s2">"SMTP_USER=USER@gmail.com"</span> -e <span class="s2">"SMTP_PASS=PASSWORD"</span> <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h3>
+<a name="available-configuration-parameters" class="anchor" href="#available-configuration-parameters"><span class="octicon octicon-link"></span></a>Available Configuration Parameters</h3>
+
+<p><em>Please refer the docker run command options for the <code>--env-file</code> flag where you can specify all required environment variables in a single file. This will save you from writing a potentially long docker run command.</em></p>
+
+<p>Below is the complete list of parameters that can be set using environment variables.</p>
+
+<ul>
+<li>
+<strong>REDMINE_HTTPS</strong>: Enable HTTPS (SSL/TLS) port on server. Defaults to <code>false</code>.</li>
+<li>
+<strong>REDMINE_PORT</strong>: The port of the Redmine server. Defaults to <code>80</code> for plain http and <code>443</code> when https is enabled.</li>
+<li>
+<strong>REDMINE_RELATIVE_URL_ROOT</strong>: The relative url of the Redmine server, e.g. <code>/redmine</code>. No default.</li>
+<li>
+<strong>REDMINE_FETCH_COMMITS</strong>: Setup cron job to fetch commits. Possible values <code>disable</code>, <code>hourly</code>, <code>daily</code> or <code>monthly</code>. Disabled by default.</li>
+<li>
+<strong>DB_TYPE</strong>: The database type. Possible values: <code>mysql</code>, <code>postgres</code>. Defaults to <code>mysql</code>.</li>
+<li>
+<strong>DB_HOST</strong>: The database server hostname. Defaults to <code>localhost</code>.</li>
+<li>
+<strong>DB_PORT</strong>: The database server port. Defaults to <code>3306</code>.</li>
+<li>
+<strong>DB_NAME</strong>: The database name. Defaults to <code>redmine_production</code>
+</li>
+<li>
+<strong>DB_USER</strong>: The database user. Defaults to <code>root</code>
+</li>
+<li>
+<strong>DB_PASS</strong>: The database password. Defaults to no password</li>
+<li>
+<strong>DB_POOL</strong>: The database connection pool count. Defaults to <code>5</code>.</li>
+<li>
+<strong>NGINX_MAX_UPLOAD_SIZE</strong>: Maximum acceptable upload size. Defaults to <code>20m</code>.</li>
+<li>
+<strong>NGINX_X_FORWARDED_PROTO</strong>: Advanced configuration option for the <code>proxy_set_header X-Forwarded-Proto</code> setting in the redmine nginx vHost configuration. Defaults to <code>https</code> when <code>REDMINE_HTTPS</code> is <code>true</code>, else defaults to <code>$scheme</code>.</li>
+<li>
+<strong>UNICORN_WORKERS</strong>: The number of unicorn workers to start. Defaults to <code>2</code>.</li>
+<li>
+<strong>UNICORN_TIMEOUT</strong>: Sets the timeout of unicorn worker processes. Defaults to <code>60</code> seconds.</li>
+<li>
+<strong>MEMCACHE_HOST</strong>: The host name of the memcached server. No defaults.</li>
+<li>
+<strong>MEMCACHE_PORT</strong>: The connection port of the memcached server. Defaults to <code>11211</code>.</li>
+<li>
+<strong>SSL_CERTIFICATE_PATH</strong>: The path to the SSL certificate to use. Defaults to <code>/app/setup/certs/redmine.crt</code>.</li>
+<li>
+<strong>SSL_KEY_PATH</strong>: The path to the SSL certificate's private key. Defaults to <code>/app/setup/certs/redmine.key</code>.</li>
+<li>
+<strong>SSL_DHPARAM_PATH</strong>: The path to the Diffie-Hellman parameter. Defaults to <code>/app/setup/certs/dhparam.pem</code>.</li>
+<li>
+<strong>SMTP_ENABLED</strong>: Enable mail delivery via SMTP. Defaults to <code>true</code> if <code>SMTP_USER</code> is defined, else defaults to <code>false</code>.</li>
+<li>
+<strong>SMTP_DOMAIN</strong>: SMTP domain. Defaults to <code>www.gmail.com</code>
+</li>
+<li>
+<strong>SMTP_HOST</strong>: SMTP server host. Defaults to <code>smtp.gmail.com</code>
+</li>
+<li>
+<strong>SMTP_PORT</strong>: SMTP server port. Defaults to <code>587</code>.</li>
+<li>
+<strong>SMTP_USER</strong>: SMTP username.</li>
+<li>
+<strong>SMTP_PASS</strong>: SMTP password.</li>
+<li>
+<strong>SMTP_STARTTLS</strong>: Enable STARTTLS. Defaults to <code>true</code>.</li>
+<li>
+<strong>SMTP_AUTHENTICATION</strong>: Specify the SMTP authentication method. Defaults to <code>:login</code> if <code>SMTP_USER</code> is set.</li>
+</ul><h1>
+<a name="plugins" class="anchor" href="#plugins"><span class="octicon octicon-link"></span></a>Plugins</h1>
+
+<p>The functionality of redmine can be extended using plugins developed by the community. You can find a list of available plugins in the <a href="http://www.redmine.org/plugins">Redmine Plugins Directory</a>. You can also <a href="https://github.com/search?type=Repositories&amp;language=&amp;q=redmine&amp;repo=&amp;langOverride=&amp;x=0&amp;y=0&amp;start_value=1">search</a> for plugins on github.</p>
+
+<p><em>Please check the plugin compatibility with the redmine version before installing a plugin.</em></p>
+
+<h2>
+<a name="installing-plugins" class="anchor" href="#installing-plugins"><span class="octicon octicon-link"></span></a>Installing Plugins</h2>
+
+<p>Plugins should be installed in the <code>plugins</code> directory at the <a href="#data-store">data store</a>. If you are following the readme verbatim, on the host this location would be <code>/opt/redmine/data/plugins</code>.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/redmine/data/plugins
+</pre></div>
+
+<p>To install a plugin, simply copy the plugin assets to the <code>plugins</code> directory. For example, to install the <a href="https://github.com/nutso/redmine-plugin-recurring-tasks">recurring tasks</a> plugin:</p>
+
+<div class="highlight highlight-bash"><pre><span class="nb">cd</span> /opt/redmine/data/plugins
+git clone https://github.com/nutso/redmine-plugin-recurring-tasks.git
+</pre></div>
+
+<p>For most plugins this is all you need to do. With the plugin installed you can start the docker image normally. The image will detect that a plugin has been added (or removed) and automatically install the required gems and perform the plugin migrations and will be ready for use.</p>
+
+<p><strong><em>If the gem installation fails after adding a new plugin, please retry after removing the <code>/opt/redmine/data/tmp</code> directory</em></strong></p>
+
+<p>Some plugins however, require you to perform additional configurations to function correctly. You can add these steps in a <code>init</code> script at the <code>/opt/redmine/data/plugins</code> directory that will executed everytime the image is started.</p>
+
+<p>For example, the recurring tasks plugin requires that you create a cron job to periodically execute a rake task. To achieve this, create the <code>/opt/redmine/data/plugins/init</code> file with the following content:</p>
+
+<div class="highlight highlight-bash"><pre><span class="c">## Recurring Tasks Configuration</span>
+<span class="c"># get the list existing cron jobs for the redmine user</span>
+<span class="nb">set</span> +e
+crontab -u redmine -l 2&gt;/dev/null &gt;/tmp/cron.redmine
+<span class="nb">set</span> -e
+
+<span class="c"># add new job for recurring tasks</span>
+<span class="nb">echo</span> <span class="s1">'* */4 * * * cd /home/redmine/redmine &amp;&amp; bundle exec rake redmine:recur_tasks RAILS_ENV=production &gt;&gt; log/cron_rake.log 2&gt;&amp;1'</span> &gt;&gt;/tmp/cron.redmine
+
+<span class="c"># install the new jobs</span>
+crontab -u redmine /tmp/cron.redmine 2&gt;/dev/null
+
+<span class="c"># remove the temporary file</span>
+rm -rf /tmp/cron.redmine
+
+<span class="c">## End of Recurring Tasks Configuration</span>
+</pre></div>
+
+<p>Now whenever the image is started the above init script will be executed and the required cron job will be installed.</p>
+
+<p>Previously this image packaged a couple of plugins by default. Existing users would notice that those plugins are no longer available. If you want them back, follow these instructions:</p>
+
+<div class="highlight highlight-bash"><pre><span class="nb">cd</span> /opt/redmine/data/plugins
+wget http://goo.gl/iJcvCP -O - <span class="p">|</span> sh
+</pre></div>
+
+<p><em>Please Note: this <a href="https://gist.github.com/dockerimages/dd24dfdd13bc472d11a5">plugin install script</a> is not maintained and you would need to fix it if required (especially broken links)</em></p>
+
+<h2>
+<a name="uninstalling-plugins" class="anchor" href="#uninstalling-plugins"><span class="octicon octicon-link"></span></a>Uninstalling Plugins</h2>
+
+<p>To uninstall plugins you need to first tell redmine about the plugin you need to uninstall. This is done via a rake task:</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2 <span class="se">\</span>
+  app:rake redmine:plugins:migrate <span class="nv">NAME</span><span class="o">=</span>plugin_name <span class="nv">VERSION</span><span class="o">=</span>0
+</pre></div>
+
+<p>Once the rake task has been executed, the plugin should be removed from the <code>/opt/redmine/data/plugins/</code> directory.</p>
+
+<div class="highlight highlight-bash"><pre>rm -rf /opt/redmine/data/plugins/plugin_name
+</pre></div>
+
+<p>Any configuration that you may have added in the <code>/opt/redmine/data/plugins/init</code> script for the plugin should also be removed.</p>
+
+<p>For example, to remove the recurring tasks plugin:</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -it --rm <span class="se">\</span>
+  -v /opt/redmine/data:/home/redmine/data <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2 <span class="se">\</span>
+  app:rake redmine:plugins:migrate <span class="nv">NAME</span><span class="o">=</span>recurring_tasks <span class="nv">VERSION</span><span class="o">=</span>0
+rm -rf /opt/redmine/data/plugins/recurring_tasks
+</pre></div>
+
+<p>Now when the image is started the plugin will be gone.</p>
+
+<h1>
+<a name="themes" class="anchor" href="#themes"><span class="octicon octicon-link"></span></a>Themes</h1>
+
+<p>Just like plugins, redmine allows users to install additional themes. You can find a list of available plugins in the <a href="www.redmine.org/projects/redmine/wiki/Theme_List">Redmine Themes Directory</a></p>
+
+<h2>
+<a name="installing-themes" class="anchor" href="#installing-themes"><span class="octicon octicon-link"></span></a>Installing Themes</h2>
+
+<p>Themes should be installed in the <code>themes</code> directory at the <a href="#data-store">data store</a>. If you are following the readme verbatim, on the host this location would be <code>/opt/redmine/data/themes</code>.</p>
+
+<div class="highlight highlight-bash"><pre>mkdir -p /opt/redmine/data/themes
+</pre></div>
+
+<p>To install a theme, simply copy the theme assets to the <code>themes</code> directory. For example, to install the <a href="https://github.com/makotokw/redmine-theme-gitmike">gitmike</a> theme:</p>
+
+<div class="highlight highlight-bash"><pre><span class="nb">cd</span> /opt/redmine/data/themes
+git clone https://github.com/makotokw/redmine-theme-gitmike.git gitmike
+</pre></div>
+
+<p>With the theme installed you can start the docker image normally and the newly installed theme should be available for use.</p>
+
+<p>Previously this image packaged a couple of themes by default. Existing users would notice that those themes are no longer available. If you want them back, follow these instructions:</p>
+
+<div class="highlight highlight-bash"><pre><span class="nb">cd</span> /opt/redmine/data/themes
+wget http://goo.gl/deKDpp -O - <span class="p">|</span> sh
+</pre></div>
+
+<p><em>Please Note: this <a href="https://gist.github.com/dockerimages/aaa1b7bb064703c1e23c">theme install script</a> is not maintained and you would need to fix it if required (especially broken links)</em></p>
+
+<h2>
+<a name="uninstalling-themes" class="anchor" href="#uninstalling-themes"><span class="octicon octicon-link"></span></a>Uninstalling Themes</h2>
+
+<p>To uninstall plugins you simply need to remove the theme from the <code>/opt/redmine/data/themes/</code> directory and restart the image.</p>
+
+<div class="highlight highlight-bash"><pre>rm -rf /opt/redmine/data/themes/theme_name
+</pre></div>
+
+<p>For example, to remove the gitmike theme:</p>
+
+<div class="highlight highlight-bash"><pre>rm -rf /opt/redmine/data/themes/gitmike
+</pre></div>
+
+<p>Now when the image is started the theme will be not be available anymore.</p>
+
+<h1>
+<a name="shell-access" class="anchor" href="#shell-access"><span class="octicon octicon-link"></span></a>Shell Access</h1>
+
+<p>For debugging and maintenance purposes you may want access the container shell. Since the container does not include a SSH server, you can use the <a href="http://man7.org/linux/man-pages/man1/nsenter.1.html">nsenter</a> linux tool (part of the util-linux package) to access the container shell.</p>
+
+<p>Some linux distros (e.g. ubuntu) use older versions of the util-linux which do not include the <code>nsenter</code> tool. To get around this <a href="https://github.com/jpetazzo" class="user-mention">@jpetazzo</a> has created a nice docker image that allows you to install the <code>nsenter</code> utility and a helper script named <code>docker-enter</code> on these distros.</p>
+
+<p>To install the nsenter tool on your host execute the following command.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --rm -v /usr/local/bin:/target dockerimages/nsenter
+</pre></div>
+
+<p>Now you can access the container shell using the command</p>
+
+<div class="highlight highlight-bash"><pre>sudo docker-enter redmine
+</pre></div>
+
+<p>For more information refer <a href="https://github.com/dockerimages/nsenter">https://github.com/dockerimages/nsenter</a></p>
+
+<p>Another tool named <code>nsinit</code> can also be used for the same purpose. Please refer <a href="https://jpetazzo.github.io/2014/03/23/lxc-attach-nsinit-nsenter-docker-0-9/">https://jpetazzo.github.io/2014/03/23/lxc-attach-nsinit-nsenter-docker-0-9/</a> for more information.</p>
+
+<h1>
+<a name="upgrading" class="anchor" href="#upgrading"><span class="octicon octicon-link"></span></a>Upgrading</h1>
+
+<p>To upgrade to newer redmine releases, simply follow this 4 step upgrade procedure.</p>
+
+<p><strong>Step 1</strong>: Update the docker image.</p>
+
+<div class="highlight highlight-bash"><pre>docker pull dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<p><strong>Step 2</strong>: Stop and remove the currently running image</p>
+
+<div class="highlight highlight-bash"><pre>docker stop redmine
+docker rm redmine
+</pre></div>
+
+<p><strong>Step 3</strong>: Backup the database in case something goes wrong.</p>
+
+<div class="highlight highlight-bash"><pre>mysqldump -h &lt;mysql-server-ip&gt; -uredmine -p --add-drop-table redmine_production &gt; redmine.sql
+</pre></div>
+
+<p><strong>Step 4</strong>: Start the image</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -d <span class="o">[</span>OPTIONS<span class="o">]</span> dockerimages/redmine:2.5.2-2
+</pre></div>
+
+<h2>
+<a name="rake-tasks" class="anchor" href="#rake-tasks"><span class="octicon octicon-link"></span></a>Rake Tasks</h2>
+
+<p>The <code>app:rake</code> command allows you to run redmine rake tasks. To run a rake task simply specify the task to be executed to the <code>app:rake</code> command. For example, if you want to send a test email to the admin user.</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>redmine -d <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="se">\</span>
+  dockerimages/redmine:2.5.2-2 app:rake redmine:email:test<span class="o">[</span>admin<span class="o">]</span>
+</pre></div>
+
+<p>Similarly, to remove uploaded files left unattached</p>
+
+<div class="highlight highlight-bash"><pre>docker run --name<span class="o">=</span>gitlab -d <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="se">\</span>
+  dockerimages/gitlab:7.2.1 app:rake redmine:attachments:prune
+</pre></div>
+
+<p>For a complete list of available rake tasks please refer <a href="http://www.redmine.org/projects/redmine/wiki/RedmineRake">www.redmine.org/projects/redmine/wiki/RedmineRake</a>.</p>
+
+<h2>
+<a name="references" class="anchor" href="#references"><span class="octicon octicon-link"></span></a>References</h2>
+
+<ul>
+<li><a href="http://www.redmine.org/">http://www.redmine.org/</a></li>
+<li><a href="http://www.redmine.org/projects/redmine/wiki/Guide">http://www.redmine.org/projects/redmine/wiki/Guide</a></li>
+<li><a href="http://www.redmine.org/projects/redmine/wiki/RedmineInstall">http://www.redmine.org/projects/redmine/wiki/RedmineInstall</a></li>
+</ul>
+        </section>
+
+        <footer>
+          Docker Redmine is maintained by <a href="https://github.com/dockerimages">dockerimages</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-48810494-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+      </div>
+    </div>
+  </body>
+</html>
